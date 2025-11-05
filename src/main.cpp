@@ -242,7 +242,18 @@ void featuresToOutput(Settings &settings, State &state, size_t wwIdx,
   auto wwSession =
       Ort::Session(state.env, wwModelPath.c_str(), settings.options);
 
-  vector<int64_t> wwShape{1, (int64_t)wwFeatures, (int64_t)embFeatures};
+  // Determine wakeword model expected input shape dynamically
+  auto wwInputInfo = wwSession.GetInputTypeInfo(0).GetTensorTypeAndShapeInfo();
+  auto wwInputShape = wwInputInfo.GetShape();
+  // Expected rank is [batch, frames, emb_dim]
+  const size_t wwFrames = (wwInputShape.size() >= 3 && wwInputShape[1] > 0)
+                              ? static_cast<size_t>(wwInputShape[1])
+                              : wwFeatures; // fallback to default
+  const size_t wwEmbDim = (wwInputShape.size() >= 3 && wwInputShape[2] > 0)
+                              ? static_cast<size_t>(wwInputShape[2])
+                              : embFeatures; // fallback to default
+
+  vector<int64_t> wwShape{1, static_cast<int64_t>(wwFrames), static_cast<int64_t>(wwEmbDim)};
 
   auto wwInputName = wwSession.GetInputNameAllocated(0, allocator);
   vector<const char *> wwInputNames{wwInputName.get()};
@@ -278,11 +289,11 @@ void featuresToOutput(Settings &settings, State &state, size_t wwIdx,
       }
     }
 
-    numBufferedFeatures = todoFeatures.size() / embFeatures;
-    while (numBufferedFeatures >= wwFeatures) {
+    numBufferedFeatures = todoFeatures.size() / wwEmbDim;
+    while (numBufferedFeatures >= wwFrames) {
       vector<Ort::Value> wwInputTensors;
       wwInputTensors.push_back(Ort::Value::CreateTensor<float>(
-          memoryInfo, todoFeatures.data(), wwFeatures * embFeatures,
+          memoryInfo, todoFeatures.data(), wwFrames * wwEmbDim,
           wwShape.data(), wwShape.size()));
 
       auto wwOutputTensors =

@@ -2,6 +2,8 @@
 
 C++ version of [openWakeWord](https://github.com/dscripka/openWakeWord).
 
+This version also supports newer versions (>0.6.0) from the main branch of the [openWakeWord](https://github.com/dscripka/openWakeWord) repository.
+
 ## Build
 
 1. Download a release of the [onnxruntime](https://github.com/microsoft/onnxruntime) and extract to `lib/<arch>` where `<arch>` is `uname -m`.
