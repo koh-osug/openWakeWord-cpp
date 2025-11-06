@@ -20,3 +20,10 @@ arecord -r 16000 -c 1 -f S16_LE -t raw - | \
 ```
 
 You can add multiple `--model <path>` arguments. See `--help` for more options.
+
+For debugging in the IDE, e.g., CLion use the redirect input from file feature:
+
+~~~shell
+mkfifo /tmp/mic.raw
+arecord -r 16000 -c 1 -f S16_LE -t raw -q > /tmp/mic.raw &
+

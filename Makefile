@@ -5,7 +5,8 @@ ONNXDIR := lib/$(ARCH)
 
 release:
 	mkdir -p build
-	g++ -o build/openwakeword -I$(ONNXDIR)/include -L$(ONNXDIR)/lib -O2 -std=c++20 -Wall -Wextra -Wl,-rpath,'$$ORIGIN' src/main.cpp -lpthread -lonnxruntime
+	g++ -o build/openwakeword -I$(ONNXDIR)/include -L$(ONNXDIR)/lib -g -O0 -fsanitize=address -fno-omit-frame-pointer -D_GLIBCXX_ASSERTIONS -std=c++20 -Wall -Wextra -Wl,-rpath,'$$ORIGIN' src/main.cpp -lpthread -lonnxruntime
+	#g++ -o build/openwakeword -I$(ONNXDIR)/include -L$(ONNXDIR)/lib -O2 -std=c++20 -Wall -Wextra -Wl,-rpath,'$$ORIGIN' src/main.cpp -lpthread -lonnxruntime
 	cp -a $(ONNXDIR)/lib/* build/
 
 clean:

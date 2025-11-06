@@ -33,7 +33,7 @@ struct Settings {
   size_t frameSize = 4 * chunkSamples;
   size_t stepFrames = 4;
 
-  float threshold = 0.5f;
+  float threshold = 0.25f;
   int triggerLevel = 4;
   int refractory = 20;
 
@@ -243,7 +243,8 @@ void featuresToOutput(Settings &settings, State &state, size_t wwIdx,
       Ort::Session(state.env, wwModelPath.c_str(), settings.options);
 
   // Determine wakeword model expected input shape dynamically
-  auto wwInputInfo = wwSession.GetInputTypeInfo(0).GetTensorTypeAndShapeInfo();
+  auto wwTypeInfo = wwSession.GetInputTypeInfo(0);
+  auto wwInputInfo = wwTypeInfo.GetTensorTypeAndShapeInfo();
   auto wwInputShape = wwInputInfo.GetShape();
   // Expected rank is [batch, frames, emb_dim]
   const size_t wwFrames = (wwInputShape.size() >= 3 && wwInputShape[1] > 0)
