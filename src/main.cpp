@@ -33,8 +33,8 @@ struct Settings {
   size_t frameSize = 4 * chunkSamples;
   size_t stepFrames = 4;
 
-  float threshold = 0.25f;
-  int triggerLevel = 4;
+  float threshold = 0.5f;
+  int triggerLevel = 3;
   int refractory = 20;
 
   bool debug = false;
